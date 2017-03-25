@@ -18,7 +18,8 @@
 org 0x7c00
 jmp 0x0000:_start
 ;Declaracao de variaveis
-counter times 1 dw 0
+counter dw 0
+counter1 dw 0
 
 _start:					;inicio da main
 	mov ax, 0
@@ -32,22 +33,26 @@ _start:					;inicio da main
 	mov bh, 0  	;id da paleta de cores
 	mov bl, 0x1 ;
 	int 10h
-	call square_print
+
+	mov dx, 90
+	times 100 call square_print
+	times 100 call square_print
 		
 jmp end					;fim da main
 
 square_print:
 		mov al,0x4 ;cor do pixel (azul)
-		mov dx, 90
-		mov cx, 150
-	.loop:
+		mov WORD [counter], 150
 		add cx, [counter]	;printa na coordenada [dx,(cx + counter)]
+	.loop:
+		mov cx, [counter]
 		call pixel_print 
-		inc BYTE [counter]	;(*counter)++
-		cmp BYTE [counter],100 ;if counter >= 100
+		inc WORD [counter]	;(*counter)++
+		cmp WORD [counter], 450 ;if counter >= 100
 		jae .endloop	;jump to endloop
 		jmp .loop		;else restart the loop
 	.endloop:
+	inc dx
 ret
 
 pixel_print:
