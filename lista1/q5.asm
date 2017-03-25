@@ -35,20 +35,50 @@ _start:					;inicio da main
 	int 10h
 
 	mov dx, 90
-	times 100 call square_print
-	times 100 call square_print
+	;times 100 call square_print
+	;times 100 call square_print
+	
+	mov al,0x4 ;cor do pixel (vermelho)
+	mov cx, 300
+	loopS:
+		push cx
+		call square_print
+		pop cx
+		loop loopS
+
+	mov al,0xf ;cor do pixel (branco)
+	mov cx, 200
+	mov dx, 150
+	loopS2:
+		push cx
+		call square_print2
+		pop cx
+		loop loopS2
 		
 jmp end					;fim da main
 
 square_print:
-		mov al,0x4 ;cor do pixel (azul)
-		mov WORD [counter], 150
+		mov WORD [counter], 150 ;coordenada x do primeiro pixel
 		add cx, [counter]	;printa na coordenada [dx,(cx + counter)]
 	.loop:
 		mov cx, [counter]
 		call pixel_print 
 		inc WORD [counter]	;(*counter)++
-		cmp WORD [counter], 450 ;if counter >= 100
+		cmp WORD [counter], 490 ;if counter >= 100
+		jae .endloop	;jump to endloop
+		jmp .loop		;else restart the loop
+	.endloop:
+	inc dx
+ret
+
+square_print2:
+		mov WORD [counter], 200 ;coordenada x do primeiro pixel
+		add cx, [counter]	;printa na coordenada [dx,(cx + counter)]
+	.loop:
+		mov cx, [counter]
+		call pixel_print 
+		inc WORD [counter]	;(*counter)++
+		cmp WORD [counter], 440 ;if counter >= 100
 		jae .endloop	;jump to endloop
 		jmp .loop		;else restart the loop
 	.endloop:
