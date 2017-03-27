@@ -65,6 +65,7 @@ jmp end					;fim da main
 ;	integer *= 10;
 ;	integer += string[si] - 48;
 ;}
+
 string_to_int:
 	push ax	;saves the al value in the stack
 	.loop:
