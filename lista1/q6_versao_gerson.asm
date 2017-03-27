@@ -30,6 +30,9 @@ string times 64 db 0
 integer db 0
 ten db 10
 
+str_maior: db " - O(n!) :(", 13, 10, 0
+str_menor: db " - O(lg n) :)", 13, 10, 0
+
 _start:					;inicio da main
 	mov di, string 		;di = &string[0]
 	call string_read 	;scanf(n_programs)
