@@ -1,9 +1,10 @@
 org 0x7c00
 jmp 0x0000:start
-
 ;   ♥ ♥ ♥ ♥ ♥
 ;   Assembly is love
 ;   @ovictoraurelio
+; 	@jgfn1
+; 	With contributions of Nathan Martins Freire.
 
 ;int number_programs
 ;int i
@@ -31,7 +32,6 @@ jmp 0x0000:start
 ;	s += string[i] - 48;
 ;}
 
-
 mult: dw 1
 dez: db 10
 
@@ -42,43 +42,24 @@ counter: db 0
 maior: db 0
 menor: db 0
 
-
 start:						;inicio da main
-	; ax is a reg to geral use
-	; ds
+							; ax is a reg to geral use
+							; ds
 	xor ax,ax ;; ax=0
 	mov ds,ax
 	mov es, ax
 	mov ss, ax				; setup stack
 	mov sp, 0x7C00			; stack grows downwards from 0x7C00
-
 			
 	mov bx, nProgramas
 	call get_num	
 	mov ax, word[nProgramas]					;coloca num em ax
 
-
 	call new_line
 	call print_int
 	call new_line
 
-
-;	mov di, nProgramas				; di aponta pra num
-;	stosw					; manda ax para num
-;	mov di, ax				; zera di
-;	mov si, nProgramas			;coloca num em si
-;
-;	call get_num	
-;	mov ax, word[nProgramas]					;coloca num em ax
-
-;	call new_line
-
-;	call print_int
-
-
-
-
-	mov cx,word[nProgramas]
+	mov cx, word[nProgramas]
 	loopReadNumbers:
 		push cx
 		
@@ -86,64 +67,19 @@ start:						;inicio da main
 			call get_num	
 			mov ax, word[tmp]					;coloca num em ax
 
-
 			call new_line
 			call print_int
 			call new_line
-
-		;AQUI EU VOU TER QUE LER VÁROIS NUMEROS...
-		;mov di, tmp
-		;stosw
-		;mov di,ax
-		;call get_num
-		;call new_line
-		;mov ax, word[tmp]	;coloca num em ax
-		
-
-		;; __start APENAS PRA MOSTRAR QUE MEU FOR TÁ FUNCIONANDO NATHAN
-				;mov ax,cx
-				;call new_line
-				;call print_int						
-		;; __end APENAS PRA MOSTRAR QUE MEU FOR TÁ FUNCIONANDO NATHAN
-
-
 		pop cx
 	loop loopReadNumbers 
-	
-
-
-
-
-
-
-		
 jmp end					;fim da main
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-;; at BX my addres 
 
 get_num:
 	xor ax, ax
 	push ax					;manda ax para a pilha (vai servir em .transform)
 	
 	mov di,bx               ;manda o endereço em BX para DI 
-	stosw					;joga AX em endereço apontado por BX
+	stosw					;joga em AX o endereço apontado por BX
 	mov si,bx 				; manda si
 
 	.loop:
@@ -194,17 +130,6 @@ get_num:
 	.done:
 		ret
 
-
-
-
-
-
-
-
-
-
-
-
 print_int:			;mostra inteiro em al como string na tela
 		xor dx, dx
 		xor cl, cl
@@ -226,8 +151,6 @@ print_int:			;mostra inteiro em al como string na tela
 				jne .print		;se o contador não for 0, imprima o próximo char
 
 ret				;caso contrario, retorne
-
-
 
 ;***
 ;	** Get a string
@@ -257,6 +180,7 @@ get_string:
         mov al, 0       	;adding 0 to knows end of string
         stosb
   		ret
+
 ;***
 ;	** Print a string
 ;				mov si, STRING
@@ -272,6 +196,7 @@ print_string:
 
 jmp print_string
 endprintstring: ret
+
 ;***
 ;	** Print new line
 ;***
@@ -283,6 +208,7 @@ new_line:
     call print_char
 	pop ax
 ret
+
 ;***
 ;	** Print a char
 ;***/
@@ -292,33 +218,6 @@ print_char:		;imprime o caracter em al
     int 10h		;interrup de tela
 	pop ax
 ret
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 end:
 jmp $

@@ -1,42 +1,95 @@
 org 0x7c00
 jmp 0x0000:_start
-;int number_programs
-;int i
-;int maior = 0
-;int menor = 100000
 ;
-;scanf(number_programs)
 ;for(i = 0; i < number_programs;i++)
 ;{
 ;	scanf(inteiro[i])
-;	if(inteiro[i] > maior)
-;		maior = inteiro[i]
-;	if(inteiro[i] < menor)
-;		menor = inteiro[i]
+;	{
+;		string_to_int()
+;		if(inteiro[i] > maior)
+;			maior = inteiro[i]
+;		if(inteiro[i] < menor)
+;			menor = inteiro[i]
+;	}
 ;}
 ;printf(maior)
 ;printf(menor)
 ;
-;Funçao de converter string pra inteiro
-;int i;
-;int s = 0;
-;for(i=0; string[i] != '\0'; ++i)
-;{
-;	s *= 10;
-;	s += string[i] - 48;
-;}
 
-;Declaracao de variaveis
+;Variable declaration
+;int n_programs
+;int counter
+;int bigger
+;int lower
+;int integer = 0;
 n_programs db 0
 counter db 0
-maior db 0
-menor db 0
+bigger db 0
+lower db 0
+string times 64 db 0
+integer db 0
+ten db 10
 
 _start:					;inicio da main
+	mov di, string 		;di = &string[0]
+	call string_read 	;scanf(n_programs)
 	
-		
+	;mov si, string 		;si = &string[0]
+	;call print_string 		;printf(n_programs)
+	
+	mov si, string
+	call string_to_int ;string_to_int()
+	
+	push cx
+	mov cx, [integer]  ;n_programs = integer
+	mov [n_programs], cx
+	pop cx
+
+	mov al, 'd'
+	call print_char
+
+	mov al, ' '
+	call print_char
+
+	mov al, byte[n_programs]
+	call print_char
+
 jmp end					;fim da main
 
+;Function which converts a string to an integer.
+;To use it, put the string pointer in the si reg and
+;then get the result in the "integer" variable.
+;
+;for(si=0; string[i] != '\0'; ++si)
+;{
+;	integer *= 10;
+;	integer += string[si] - 48;
+;}
+string_to_int:
+	push ax	;saves the al value in the stack
+	.loop:
+		lodsb
+		cmp al, 0 ;if string[si] == 0
+		je .endfunc ; jump to endfunc
+		push ax	
+			mov al, byte[ten] ;multiplies the integer by 10
+			call print_char
+			mul byte[integer]
+			mov byte[integer], al
+			push bx
+				mov bl, [si] 
+				add byte [integer], bl;intger + si (ASCII)
+			pop bx
+			sub byte [integer], 48	;integer - 48 (integer)
+		pop ax
+	jmp .loop
+
+	pop ax ;pops the value in al from the stack
+.endfunc:
+ret
+
+;Save the string pointer in the di register before using
+;this function.
 string_read:			;inicio da funcao
     call char_read		;chama funcao de leitura de caractere		
 	cmp al,0xd			;if(char(a) == carriage return)
@@ -59,6 +112,8 @@ char_read:				;Função de leitura de caracteres
 	int 16h  			;interruptor do teclado
 ret
 
+;Save the string pointer in the si register before using
+;this function.
 print_string:			;Função de printar string na tela
 	lodsb				;al = string[si++]
 	cmp al, 0			;if(char == '\0')
@@ -73,6 +128,7 @@ fim_print:				;return
 	call print_char		;printa o carriage return
 ret
 
+;Save the char in the reg al before using this function.
 print_char:				;Função de printar caractere na tela
 	mov ah,0xe			;Codigo da instrucao de imprimir um caractere que esta em al
 	mov bl,2			;Cor do caractere em modos de video graficos (verde)
