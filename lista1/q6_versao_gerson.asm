@@ -43,8 +43,8 @@ _start:					;inicio da main
 	mov si, string
 	call string_to_int ;string_to_int()
 
-	mov al, 'a'
-	call print_char
+	;mov al, 'a'
+	;call print_char
 	
 	push cx
 	mov cx, [integer]  ;n_programs = integer
@@ -69,33 +69,38 @@ jmp end					;fim da main
 string_to_int:
 	.loop:
 		mov al, byte[integer]
-		call print_char
-		mov al, si
+		;call print_char
+		mov al, [si] 	;equivalent to the first part of lodsb
 		cmp al, 0 ;if string[si] == 0
 		je .endfunc ; jump to endfunc
 
 		mov al, byte[ten] ;multiplies the integer by 10
-		call print_char
+		;call print_char
 		mul byte[integer]
 		mov byte[integer], al
 		
-		;mov al, byte[integer]
+		;mov al, 't'
 		;call print_char
 
 		mov bl, [si]
-		add byte [integer], bl;integer + si (ASCII)
+		add byte[integer], bl;integer + si (ASCII)
 		sub byte [integer], 48	;integer - 48 (integer)
 
-		inc si
+		;mov al, byte[integer] 
+		;call print_char
+		
+		;add al, 48
+		;call print_char
+
+		inc si ;second part of lodsb
 		
 		;mov al, byte[integer]
-		;call print_char
 	jmp .loop
 
 	;pop ax ;pops the value in al from the stack
 .endfunc:
-mov al, 'c'
-call print_char
+;mov al, 'c'
+;call print_char
 ret
 
 ;Save the string pointer in the di register before using
