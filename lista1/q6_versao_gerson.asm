@@ -1,6 +1,10 @@
 org 0x7c00
 jmp 0x0000:_start
 ;
+; Assembly is the best-worst love of all time.
+; Made by Jose Gerson Fialho Neto - jgfn1@github.com
+; With contributions of Nathan Martins Freire.
+;
 ;for(i = 0; i < number_programs;i++)
 ;{
 ;	scanf(inteiro[i])
@@ -43,17 +47,111 @@ _start:					;inicio da main
 	mov cx, [integer]  ;n_programs = integer
 	mov [n_programs], cx
 
-	;mov al, 49;byte[n_programs]
-	;call print_char
-
-	xor ax,ax
-	mov al, byte[n_programs]
+	xor ax, ax
+	mov al, [n_programs]
 	call print_int
+
+	mov al, ' '
+	call print_char
+
+	mov di, str_maior
+	call print_string
 
 	mov al, 10
 	call print_char
 	mov al, 13
 	call print_char
+
+	xor ax, ax
+	mov al, [n_programs]
+	call print_int
+
+	mov di, str_menor
+	call print_string
+
+	mov al, 10
+	call print_char
+	mov al, 13
+	call print_char
+
+	mov byte[integer], 0
+	mov si, 0
+	mov byte[string], 0
+
+;--------------------------------------------------------;
+	; mov cx, byte[n_programs]
+	; sub cx, 1
+	
+	; mov di, string 		;di = &string[0]
+	; call string_read 	;scanf(n_programs)
+	
+	; mov si, string
+	; call string_to_int ;string_to_int()
+
+	; push ax
+	; 	mov ax, [tmp]
+	; 	mov [maior], ax
+	; 	mov [menor], ax
+	; pop ax
+	; loopReadNumbers:
+	; 	push cx
+					
+	; 		call get_TMP
+	; 		push ax
+	; 			mov ax, [tmp]	
+	; 			cmp ax, [maior]
+	; 		pop ax
+	; 		ja .bigger
+	; 	.continue:
+	; 		push ax
+	; 			mov ax, [tmp]	
+	; 			cmp ax, [menor]
+	; 		pop ax
+	; 		jl lower
+	; 		jmp endloop
+		
+	; 	.bigger:
+	; 		push ax
+	; 			mov ax, [tmp]
+	; 			mov [maior], ax
+	; 		pop ax
+	; 	jmp .continue
+		
+	; 	lower:
+	; 		push ax
+	; 			mov ax, [tmp]
+	; 			mov [menor], ax
+	; 		pop ax
+			
+		
+	; 	pop cx
+	; loop loopReadNumbers 
+
+	; endloop:
+	; 	mov [integer], 0
+	; 	mov si, 0 		 
+	; 	mov string, 0 	
+
+	; 	mov al, byte [maior]
+	; 	call print_int
+	; 	mov di, str_maior
+	; 	call print_string
+
+	; 	mov al, byte [menor]
+	; 	call print_int
+	; 	mov di, str_menor
+	; 	call print_string
+
+	; xor ax,ax
+	; mov al, byte[n_programs]
+	; call print_int
+
+	; mov al, 10
+	; call print_char
+	; mov al, 13
+	; call print_char
+
+;--------------------------------------------------------;
 
 jmp end					;fim da main
 
