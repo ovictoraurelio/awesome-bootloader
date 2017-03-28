@@ -130,6 +130,9 @@ get_num:
 	.done:
 		ret
 
+;To use this function, put the value you wanna print in the
+;reg ax and be sure that there's no important data in the regs
+;dx and cl.
 print_int:			;mostra inteiro em al como string na tela
 		xor dx, dx
 		xor cl, cl
