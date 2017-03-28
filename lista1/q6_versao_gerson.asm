@@ -38,6 +38,7 @@ str_bigger: db " - O(n!) :(", 13, 10, 0
 str_lower: db " - O(lg n) :)", 13, 10, 0
 
 _start:					;inicio da main
+;--------------------------------------------------------; 
 	mov di, string 		;di = &string[0]
 	call string_read 	;scanf(n_programs)
 	
@@ -51,38 +52,6 @@ _start:					;inicio da main
 	mov byte[string], 0
 	mov si, 0 		 
 
-	; xor ax, ax
-	; mov al, [n_programs]
-	; call print_int
-
-	; mov al, ' '
-	; call print_char
-
-	; mov si, str_bigger
-	; call print_string
-
-	; ; mov al, 10
-	; ; call print_char
-	; ; mov al, 13
-	; ; call print_char
-
-	; xor ax, ax
-	; mov al, [n_programs]
-	; call print_int
-
-	; mov si, str_lower
-	; call print_string
-
-	; mov al, 10
-	; call print_char
-	; mov al, 13
-	; call print_char
-
-	; mov byte[integer], 0
-	; mov si, 0
-	; mov byte[string], 0
-
-;--------------------------------------------------------; 
 	
 	mov di, string 		;di = &string[0]
 	call string_read 	;scanf(n_programs)
