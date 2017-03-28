@@ -138,7 +138,7 @@ print_int:			;mostra inteiro em al como string na tela
 		xor cl, cl
 		.sts:			;começa conversão (sts = send to stack)
 				div byte[dez]		;divide ax por cl(10) salva quociente em al e resto em ah
-				mov dl, ah		;manda ah pra cl
+				mov dl, ah		;manda ah pra dl
 				mov ah, 0		;zera ah
 				push dx			;manda dx pra pilha
 				inc cl			;incrementa cl
@@ -150,9 +150,8 @@ print_int:			;mostra inteiro em al como string na tela
 				add al, 48		;transforma numero em char
 				call print_char	;imprime char em al
 				dec cl			;decrementa cl
-				cmp cl, 0		;compara al com 0
+				cmp cl, 0		;compara cl com 0
 				jne .print		;se o contador não for 0, imprima o próximo char
-
 ret				;caso contrario, retorne
 
 ;***
