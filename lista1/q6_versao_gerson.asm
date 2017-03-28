@@ -37,26 +37,50 @@ _start:					;inicio da main
 	mov di, string 		;di = &string[0]
 	call string_read 	;scanf(n_programs)
 	
-	;mov si, string 		;si = &string[0]
-	;call print_string 		;printf(n_programs)
-	
 	mov si, string
 	call string_to_int ;string_to_int()
 	
-	push cx
 	mov cx, [integer]  ;n_programs = integer
 	mov [n_programs], cx
-	pop cx
 
-	mov al, 49;byte[n_programs]
-	call print_char
+	;mov al, 49;byte[n_programs]
+	;call print_char
 
 	xor ax,ax
-	mov ax, word[n_programs]
+	mov al, byte[n_programs]
 	call print_int
 
+	mov al, 10
+	call print_char
+	mov al, 13
+	call print_char
 
 jmp end					;fim da main
+
+;To use this function, put the value you wanna print in the
+;reg ax and be sure that there's no important data in the regs
+;dx and cl.
+print_int:			;mostra inteiro em al como string na tela
+	xor dx, dx
+	xor cl, cl
+	.sts:			;começa conversão (sts = send to stack)
+			div byte[ten]		;divide ax por cl(10) salva quociente em al e resto em ah
+			mov dl, ah		;manda ah pra dl
+			mov ah, 0		;zera ah
+			push dx			;manda dx pra pilha
+			inc cl			;incrementa cl
+			cmp al, 0		;compara o quociente(al) com 0
+			jne .sts		;se não for 0 manda próximo caractere para pilha
+
+	.print:						;caso contrário
+			pop ax			;pop na pilha pra ax
+			add al, 48		;transforma numero em char
+			call print_char	;imprime char em al
+			dec cl			;decrementa cl
+			cmp cl, 0		;compara cl com 0
+			jne .print		;se o contador não for 0, imprima o próximo char
+
+ret				;caso contrario, retorne
 
 ;Function which converts a string to an integer.
 ;To use it, put the string pointer in the si reg and
@@ -67,15 +91,6 @@ jmp end					;fim da main
 ;	integer *= 10;
 ;	integer += string[si] - 48;
 ;}
-
-;To use this function, put the value you wanna print in the
-;reg ax and be sure that there's no important data in the regs
-;dx and cl.
-print_int:			;mostra inteiro em al como string na tela
-		
-
-ret				;caso contrario, retorne
-
 string_to_int:
 	.loop:
 		mov al, byte[integer]
@@ -106,7 +121,6 @@ string_to_int:
 		
 		;mov al, byte[integer]
 	jmp .loop
-
 	;pop ax ;pops the value in al from the stack
 .endfunc:
 ;mov al, 'c'
