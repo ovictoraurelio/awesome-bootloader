@@ -89,11 +89,11 @@ _start:					;inicio da main
 	mov si, string
 	call string_to_int ;string_to_int()
 
-	push ax
+	;push ax
 		mov al, byte[integer]
 		mov byte[bigger], al
 		mov byte[lower], al
-	pop ax
+	;pop ax
 	loopReadNumbers:
 			mov di, string 		;di = &string[0]
 			call string_read 	;scanf(n_programs)
