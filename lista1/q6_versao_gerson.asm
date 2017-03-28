@@ -10,14 +10,14 @@ jmp 0x0000:_start
 ;	scanf(inteiro[i])
 ;	{
 ;		string_to_int()
-;		if(inteiro[i] > maior)
-;			maior = inteiro[i]
-;		if(inteiro[i] < menor)
-;			menor = inteiro[i]
+;		if(inteiro[i] > bigger)
+;			bigger = inteiro[i]
+;		if(inteiro[i] < lower)
+;			lower = inteiro[i]
 ;	}
 ;}
-;printf(maior)
-;printf(menor)
+;printf(bigger)
+;printf(lower)
 ;
 
 ;Variable declaration
@@ -34,8 +34,8 @@ string times 64 db 0
 integer db 0
 ten db 10
 
-str_maior: db " - O(n!) :(", 13, 10, 0
-str_menor: db " - O(lg n) :)", 13, 10, 0
+str_bigger: db " - O(n!) :(", 13, 10, 0
+str_lower: db " - O(lg n) :)", 13, 10, 0
 
 _start:					;inicio da main
 	mov di, string 		;di = &string[0]
@@ -47,109 +47,115 @@ _start:					;inicio da main
 	mov cx, [integer]  ;n_programs = integer
 	mov [n_programs], cx
 
-	xor ax, ax
-	mov al, [n_programs]
-	call print_int
-
-	mov al, ' '
-	call print_char
-
-	mov di, str_maior
-	call print_string
-
-	mov al, 10
-	call print_char
-	mov al, 13
-	call print_char
-
-	xor ax, ax
-	mov al, [n_programs]
-	call print_int
-
-	mov di, str_menor
-	call print_string
-
-	mov al, 10
-	call print_char
-	mov al, 13
-	call print_char
-
-	mov byte[integer], 0
-	mov si, 0
-	mov byte[string], 0
-
-;--------------------------------------------------------;
-	; mov cx, byte[n_programs]
-	; sub cx, 1
-	
-	; mov di, string 		;di = &string[0]
-	; call string_read 	;scanf(n_programs)
-	
-	; mov si, string
-	; call string_to_int ;string_to_int()
-
-	; push ax
-	; 	mov ax, [tmp]
-	; 	mov [maior], ax
-	; 	mov [menor], ax
-	; pop ax
-	; loopReadNumbers:
-	; 	push cx
-					
-	; 		call get_TMP
-	; 		push ax
-	; 			mov ax, [tmp]	
-	; 			cmp ax, [maior]
-	; 		pop ax
-	; 		ja .bigger
-	; 	.continue:
-	; 		push ax
-	; 			mov ax, [tmp]	
-	; 			cmp ax, [menor]
-	; 		pop ax
-	; 		jl lower
-	; 		jmp endloop
-		
-	; 	.bigger:
-	; 		push ax
-	; 			mov ax, [tmp]
-	; 			mov [maior], ax
-	; 		pop ax
-	; 	jmp .continue
-		
-	; 	lower:
-	; 		push ax
-	; 			mov ax, [tmp]
-	; 			mov [menor], ax
-	; 		pop ax
-			
-		
-	; 	pop cx
-	; loop loopReadNumbers 
-
-	; endloop:
-	; 	mov [integer], 0
-	; 	mov si, 0 		 
-	; 	mov string, 0 	
-
-	; 	mov al, byte [maior]
-	; 	call print_int
-	; 	mov di, str_maior
-	; 	call print_string
-
-	; 	mov al, byte [menor]
-	; 	call print_int
-	; 	mov di, str_menor
-	; 	call print_string
-
-	; xor ax,ax
-	; mov al, byte[n_programs]
+	; xor ax, ax
+	; mov al, [n_programs]
 	; call print_int
+
+	; mov al, ' '
+	; call print_char
+
+	; mov si, str_bigger
+	; call print_string
+
+	; ; mov al, 10
+	; ; call print_char
+	; ; mov al, 13
+	; ; call print_char
+
+	; xor ax, ax
+	; mov al, [n_programs]
+	; call print_int
+
+	; mov si, str_lower
+	; call print_string
 
 	; mov al, 10
 	; call print_char
 	; mov al, 13
 	; call print_char
+
+	; mov byte[integer], 0
+	; mov si, 0
+	; mov byte[string], 0
+
+;--------------------------------------------------------;
+	xor cx, cx
+	mov cl, byte[n_programs]
+	sub cx, 1
+	
+	mov di, string 		;di = &string[0]
+	call string_read 	;scanf(n_programs)
+	
+	mov si, string
+	call string_to_int ;string_to_int()
+
+	push ax
+		mov ax, [integer]
+		mov [bigger], ax
+		mov [lower], ax
+	pop ax
+	loopReadNumbers:
+			mov al, 13
+			call print_char
+			mov al, 10
+			call print_char
+
+			mov di, string 		;di = &string[0]
+			call string_read 	;scanf(n_programs)
+			
+			mov si, string
+			call string_to_int ;string_to_int()
+
+			push ax
+				mov ax, [integer]	
+				cmp ax, [bigger]
+			pop ax
+			ja .bigger
+		.continue:
+				mov ax, [integer]	
+				cmp ax, [lower]
+			jl .lower
+			jmp endloop
+		
+		.bigger:
+				mov ax, [integer]
+				mov [bigger], ax
+		jmp .continue
+		
+		.lower:
+				mov ax, [integer]
+				mov [lower], ax
+	loop loopReadNumbers 
+
+	endloop:
+		mov byte[integer], 0
+		mov si, 0 		 
+		mov byte[string], 0 	
+		
+		push ax
+		xor ax, ax
+		mov al, 'a'
+		call print_char
+		pop ax
+
+		mov al, byte [bigger]
+		call print_int
+		mov si, str_bigger
+		call print_string
+
+		mov al, byte [lower]
+		call print_int
+		mov si, str_lower
+		call print_string
+
+	xor ax,ax
+	; mov al, byte[n_programs]
+	; call print_int
+
+	mov al, 10
+	call print_char
+	mov al, 13
+	call print_char
 
 ;--------------------------------------------------------;
 
