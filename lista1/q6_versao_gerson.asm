@@ -44,8 +44,12 @@ _start:					;inicio da main
 	mov si, string
 	call string_to_int ;string_to_int()
 	
-	mov cx, [integer]  ;n_programs = integer
-	mov [n_programs], cx
+	mov cl, byte[integer]  ;n_programs = integer
+	mov byte[n_programs], cl
+
+	mov byte[integer], 0
+	mov byte[string], 0
+	mov si, 0 		 
 
 	; xor ax, ax
 	; mov al, [n_programs]
@@ -78,10 +82,7 @@ _start:					;inicio da main
 	; mov si, 0
 	; mov byte[string], 0
 
-;--------------------------------------------------------;
-	xor cx, cx
-	mov cl, byte[n_programs]
-	sub cx, 1
+;--------------------------------------------------------; 
 	
 	mov di, string 		;di = &string[0]
 	call string_read 	;scanf(n_programs)
@@ -89,11 +90,22 @@ _start:					;inicio da main
 	mov si, string
 	call string_to_int ;string_to_int()
 
-	;push ax
-		mov al, byte[integer]
-		mov byte[bigger], al
-		mov byte[lower], al
-	;pop ax
+
+	xor cx, cx
+	mov cl, byte[n_programs]
+	sub cx, 1
+
+	xor ax, ax
+	mov al, byte[integer]
+	mov byte[bigger], al
+	mov byte[lower], al
+
+	mov al, byte[integer]
+	mov byte[integer], 0
+	mov byte[string], 0
+
+	cmp cx, 0
+	je endloop
 	loopReadNumbers:
 			mov di, string 		;di = &string[0]
 			call string_read 	;scanf(n_programs)
@@ -105,9 +117,9 @@ _start:					;inicio da main
 			cmp al, byte[bigger]
 			ja .bigger
 		.continue:
-				mov al, byte[integer]	
-				cmp al, byte[lower]
-			jl .lower
+			mov al, byte[integer]	
+			cmp al, byte[lower]
+			jb .lower
 			jmp .point
 		
 		.bigger:
@@ -118,15 +130,20 @@ _start:					;inicio da main
 		jmp .continue
 		
 		.lower:
+				; push ax
+				; xor ax, ax
+				; mov al, 'b'
+				; call print_char
+				; pop ax
 				mov al, byte[integer]
 				mov byte[lower], al
 	.point:
-	loop loopReadNumbers 
-
-	endloop:
 		mov byte[integer], 0
 		mov si, 0 		 
 		mov byte[string], 0 	
+	loop loopReadNumbers 
+
+	endloop:
 
 	push ax
 		xor ax, ax
