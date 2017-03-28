@@ -90,73 +90,57 @@ _start:					;inicio da main
 	call string_to_int ;string_to_int()
 
 	push ax
-		mov ax, [integer]
-		mov [bigger], ax
-		mov [lower], ax
+		mov al, byte[integer]
+		mov byte[bigger], al
+		mov byte[lower], al
 	pop ax
 	loopReadNumbers:
-			mov al, 13
-			call print_char
-			mov al, 10
-			call print_char
-
 			mov di, string 		;di = &string[0]
 			call string_read 	;scanf(n_programs)
 			
 			mov si, string
 			call string_to_int ;string_to_int()
 
-			push ax
-				mov ax, [integer]	
-				cmp ax, [bigger]
-			pop ax
+			mov al, byte[integer]	
+			cmp al, byte[bigger]
 			ja .bigger
 		.continue:
-				mov ax, [integer]	
-				cmp ax, [lower]
+				mov al, byte[integer]	
+				cmp al, byte[lower]
 			jl .lower
-			jmp endloop
+			jmp .point
 		
 		.bigger:
-				mov ax, [integer]
-				mov [bigger], ax
+				;mov al, 'a'
+				;call print_char
+				mov al, byte[integer]
+				mov byte[bigger], al
 		jmp .continue
 		
 		.lower:
-				mov ax, [integer]
-				mov [lower], ax
+				mov al, byte[integer]
+				mov byte[lower], al
+	.point:
 	loop loopReadNumbers 
 
 	endloop:
 		mov byte[integer], 0
 		mov si, 0 		 
 		mov byte[string], 0 	
-		
-		push ax
-		xor ax, ax
-		mov al, 'a'
-		call print_char
-		pop ax
 
-		mov al, byte [bigger]
+	push ax
+		xor ax, ax
+		mov al, byte[bigger]
 		call print_int
 		mov si, str_bigger
 		call print_string
 
+		xor ax, ax
 		mov al, byte [lower]
 		call print_int
 		mov si, str_lower
 		call print_string
-
-	xor ax,ax
-	; mov al, byte[n_programs]
-	; call print_int
-
-	mov al, 10
-	call print_char
-	mov al, 13
-	call print_char
-
+	pop ax
 ;--------------------------------------------------------;
 
 jmp end					;fim da main
