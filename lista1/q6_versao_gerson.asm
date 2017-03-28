@@ -42,9 +42,6 @@ _start:					;inicio da main
 	
 	mov si, string
 	call string_to_int ;string_to_int()
-
-	;mov al, 'a'
-	;call print_char
 	
 	push cx
 	mov cx, [integer]  ;n_programs = integer
@@ -53,6 +50,11 @@ _start:					;inicio da main
 
 	mov al, 49;byte[n_programs]
 	call print_char
+
+	xor ax,ax
+	mov ax, word[n_programs]
+	call print_int
+
 
 jmp end					;fim da main
 
@@ -65,6 +67,14 @@ jmp end					;fim da main
 ;	integer *= 10;
 ;	integer += string[si] - 48;
 ;}
+
+;To use this function, put the value you wanna print in the
+;reg ax and be sure that there's no important data in the regs
+;dx and cl.
+print_int:			;mostra inteiro em al como string na tela
+		
+
+ret				;caso contrario, retorne
 
 string_to_int:
 	.loop:
