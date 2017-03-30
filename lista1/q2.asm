@@ -7,23 +7,26 @@ jmp 0x0000:start
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 mult: dw 1
-string: times 5 db 0
 dez: db 10
 num: dw 0
-n: db 0
 
 start:
 	xor ax, ax
 	mov es, ax
+	mov dx, ax
 	mov ss, ax	; setup stack
 	mov sp, 0x7C00	; stack grows downwards from 0x7C00
 	mov di, num	; di aponta pra num
 	stosw		; manda ax para num
-	mov di, ax	; zera di
+	inc ax		;faz ax = 1
+	mov di, mult	; di aponta pra mult
+	stosw		; manda ax para mult
+	mov di, es	; zera di
+	mov ax, es	; zera ax
+
 
 	get_num:
 		push ax			;manda ax para a pilha (vai servir em .transform)
-
 
 		.loop:
 		mov ah, 0		;instrução para ler do teclado
@@ -39,8 +42,6 @@ start:
 
 						;caso contrario
 		call print_char 	;imprime o caracter recebido
-		mov di, string		;di aponta pra string
-		stosb			;manda char em al para string e di++
 
 		xor ah, ah		;zerar ah
 		push ax			;mandar ah e al para a pilha pois al não pode ir sozinho, ah será ignorado
@@ -90,7 +91,7 @@ start:
 		.sts:			;começa conversão (sts = send to stack)
 
 		div byte[dez]		;divide ax por cl(10) salva quociente em al e resto em ah
-		mov dl, ah		;manda ah pra cl
+		mov dl, ah		;manda ah pra dl
 		mov ah, 0		;zera ah
 		push dx			;manda dx pra pilha
 		inc cl			;incrementa cl
@@ -136,7 +137,7 @@ start:
 		call show_int			;mostra inteiro em al como string na tela
 
 
-		mov al, '.'                     ;coloca ' ' (espaço) em al
+		mov al, '.'                     ;coloca '.' em al
                 call print_char         ;imprime char em al
 		pop ax
 		sal ah, 1 		;multiplica resto por 10/5 (2)
