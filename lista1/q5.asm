@@ -35,8 +35,6 @@ _start:					;inicio da main
 	int 10h
 
 	mov dx, 90
-	;times 100 call square_print
-	;times 100 call square_print
 	
 	mov al,0x4 ;cor do pixel (vermelho)
 	mov cx, 300
