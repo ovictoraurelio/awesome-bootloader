@@ -10,8 +10,9 @@ number times 2 db 0
 dez db 10
 rand dw 0
 i db 0
-sequence times 40 db 0
+sequence times 40 db 0 
 stack dw 0
+head dw 0
 
 
 start:
@@ -22,6 +23,7 @@ start:
 
 	.init:
 		xor ax, ax		;zera ax
+		
 		mov es, ax		;zera es
 		mov di,	number 	;coloca number em di
 		stosw 			;manda ax (0) para es:di (number)
@@ -31,25 +33,41 @@ start:
 		mov sp, 7C00h	;setup SP
 
 	.video_mode:
-		mov ah, 0 		;numero da chamada
-		mov al, 12h 	;modo de video
+		mov ah, 0 ;numero da chamada
+		mov al, 12h ;modo de video
 		int 10h
-
-	game:
-		call random 	;makes bl a random number between 1 and 4 and bh == 0
-		push bx
 		
-		show_sequence:
+	game:
+		call random 		;makes bl a random number between 1 and 4 and bh == 0
+		;push bx
+
+		; push bx
+		; inc bx
+		; push bx
+		; inc bx
+		; push bx
+		; inc bx
+		; push bx
+		; inc bx
+		; push bx
+		; inc bx
+		; push bx
+
+		mov word[stack], sp
+		.show_sequence:
 			pop bx 				
 			cmp bx, 0			;compara bx com 0
 			je get_answer		;se for igual vá para get answer
 			call show_color		;muda background pra cor q está em bl
 			call delay			;delay
-			jmp show_sequence	;recomeça
+			jmp .show_sequence	;recomeça
+
+		
 
 		;GERSON
 		;mostra mensagem pra pedir sequencia invertida
 		get_answer:
+			mov sp, word[stack]
 			times 4 call delay			;delay
 			jmp game
 
@@ -125,20 +143,25 @@ inc_score:	;incrementa score
 	pop ax			;restaura ax
 ret
 
-delay:		;delay de .5 segundos
+delay:		;delay de .5 segundos			
+	;push ax			;salve ax
+	;push cx			;salve cx
+	;push dx			;salve dx
 	mov AH, 86h		;wait
-	mov CX, 000Ah		;high order word
-	mov DX, 000Ah	;cx:dx == 7A120
+	mov CX, 001Ah		;high order word
+	mov DX, 011Ah	;cx:dx == 7A120
 	int 15h			;interrupt 
+	;pop dx			;restore dx
+	;pop cx			;restore cx
+	;pop ax			;restore ax
 ret
 
 show_color: 			;mostra cor em bl
 	mov ah, 0xb ;numero da chamada
 	mov bh, 0  	;id da paleta de cores
-	int 10h		;id da paleta de cores
-	mov word[stack], sp		
+	;mov word[stack], sp		
 	int 10h				;video interrupt
-	mov sp, word[stack]		
+	;mov sp, word[stack]		
 ret
 
 print_msg:	;parametros:cx-tamanho,bp-ponteiro,dh-linha,dl-coluna
@@ -185,15 +208,15 @@ ret					;caso contrario, retorne
 
 random:
 	mov ax, word[rand]
-	mov dx, 7993
+	mov dx, 93
 	mov cx, 9781
 	mul dx
 	add ax, cx
+	;xor ah, ah
 	mov word[rand], ax	;updates seed
-	mov cl, 4  			
-	div cl				;al = ax/cl, ah = ax % cl
-	inc ah				;ah = [1, 4]
-	mov bl, ah			;bl = ah
+	and al, 00000011b	;same as al = al%4
+	inc al				;a1 = [1, 4]
+	mov bl, al			;bl = ah
 	xor bh, bh 			;bx  ==  bl
 ret
 
