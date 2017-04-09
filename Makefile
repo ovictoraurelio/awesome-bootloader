@@ -40,7 +40,7 @@ kernel2=kernel2
 file = $(disk)
 
 #clear
-start: clean make_disk compile1 writing_on_disk1 compile2 writing_on_disk2 hexdump launch_qemu end
+start: clean make_disk compiles writing_on_disk hexdump launch_qemu end
 
 welcome:
 
@@ -50,20 +50,17 @@ clean:
 make_disk:
 		dd if=/dev/zero of=$(disk) bs=$(blockSize) count=$(diskSize) status=noxfer
 
-compile1:
+compiles:
 		nasm -f bin $(stage1).asm -o $(stage1).bin
-
-compile2:
 		nasm -f bin $(stage2).asm -o $(stage2).bin
-#		nasm $(ASMFLAGS) $(kernel).asm -o $(kernel).bin
-#		nasm $(ASMFLAGS) $(kernel2).asm -o $(kernel2).bin
+		nasm $(ASMFLAGS) $(kernel).asm -o $(kernel).bin
+		nasm $(ASMFLAGS) $(kernel2).asm -o $(kernel2).bin
 
-writing_on_disk1:
+writing_on_disk:
 		dd if=$(stage1).bin of=$(disk) bs=$(blockSize) count=1 conv=notrunc status=noxfer
-writing_on_disk2:
 		dd if=$(stage2).bin of=$(disk) bs=$(blockSize) seek=$(stage2Head) count=$(stage2BlocksSize) conv=notrunc status=noxfer
-#		dd if=$(kernel).bin of=$(disk) bs=$(blockSize) seek=$(kernelHead) count=$(kernelBlockSize) conv=notrunc
-#		dd if=$(kernel2).bin of=$(disk) bs=$(blockSize) seek=$(kernelHead) count=$(kernelBlockSize) conv=notrunc
+		dd if=$(kernel).bin of=$(disk) bs=$(blockSize) seek=$(kernelHead) count=$(kernelBlockSize) conv=notrunc
+		dd if=$(kernel2).bin of=$(disk) bs=$(blockSize) seek=$(kernelHead) count=$(kernelBlockSize) conv=notrunc
 
 hexdump:
 		hexdump $(file)
