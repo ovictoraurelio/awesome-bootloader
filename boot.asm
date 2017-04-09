@@ -41,7 +41,7 @@ start:
           	mov	al, 0x02				; Number of sectors to read
           	mov	cl, 0x02				; Sector to read.
           	mov	dh, 0x0				  ; Head number
-          	mov dl, 0x0		  ; Drive number
+          	mov dl, 0x0		      ; Drive number
           	int	0x13					  ; DISK interrupt
 
             jc .load_disk
