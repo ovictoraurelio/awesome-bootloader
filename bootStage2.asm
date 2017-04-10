@@ -17,6 +17,7 @@ botText: db '                Awesome-Bootloader by BootloaderBros ', 13, 10, 0
 option1: db ' > Lenux ', 13, 10, '   Ruindous ', 13, 10, 0
 option2: db '   Lenux ', 13, 10, ' > Ruindous ', 13, 10, 0
 loading_messages: db ' Veryfing disks. ', 13, 10, ' Searching for i/o devices. ', 13, 10, ' Loading settings of lan. ', 13, 10, ' Loading settings of something. ', 13, 10,' Loading another thing. ', 13, 10, ' Loading stranger things. ', 13, 10, ' Are you reading about things that we loading? ', 13, 10, ' Loading another a lot of things. ', 13, 10, ' Loading something dark. HaHaHa ', 13, 10, ' Status of your screen: OK! ', 13, 10, ' Scanning your heart rate. ', 13, 10, ' Your health is OK! ', 13, 13, 10, ' Starting the boot manager.',  0
+
 ;
 ;		On the map of memory, 0x00500 has 32kb
 ;			Our kernel, will be load on 0x00007E00 tha has 480.5kb
@@ -67,14 +68,12 @@ start:
 					call show_boot_menu2
 					jmp loop											;se for menor que '0' não é um número, ignore
 
-		jmp end
-
 
 		;******************************
 		;	** A Boot option selected
 		;******************************
 		boot_selected:
-				call clearScreen
+
 				mov ah,0x3 											; to read current cursor position
 				int 0x10
 
@@ -100,7 +99,7 @@ start:
 ;	**************** BOOT MENU TEMPLATE
 ;************************************************************
 		show_menu_template:
-				call clearScreen
+				call clear_screen
 
 				mov si, topText
 				call print_string
@@ -200,7 +199,7 @@ start:
 ;************************************************************
 ;	**************** CLEAR SCREEN
 ;************************************************************
-		clearScreen:
+		clear_screen:
 	    pusha
 			; AH=2h: Set cursor position
 	    mov ax, 0x0700  ; function 07, AL=0 means scroll whole window
@@ -238,38 +237,50 @@ start:
 ;	**************** LOAD OPTION ONE
 ;************************************************************
 		load_option_one:
-				mov	ax, 0x000007E0  ;0x00007E00
-				mov	es, ax
-				xor	bx, bx          ;  set on BX the address of our code at PC Memory
 
-				mov	ah, 0x03				; Interrupt that read sectors into Memory
+				xor ax,ax
+				mov ds,ax
+
+				mov ax, 0x07E0
+				mov es, ax
+				xor bx, bx					;  set on ES:BX the address of our code at PC Memory
+
+				mov	ah, 0x02				; Interrupt that read sectors into Memory
 														; this interrupt use all of registers below
-				mov	ch, 0x0				  ; Cylinder number
 				mov	al, 0x0A				; Number of sectors to read
-				mov	cl, 0x03				; Sector to read.
+				mov	ch, 0x00			  ; Cylinder number
+				mov	cl, 0x04				; Sector to read.
 				mov	dh, 0x0				  ; Head number
 				mov dl, 0x0		      ; Drive number
 				int	0x13					  ; DISK interrupt
-		ret
+
+		jc load_option_one		; se leu com sucesso, pula para o endereço do kernel (ES:00)
+
+	jmp 0x000007E00  ; jump to execute the kernel 1
 
 ;************************************************************
 ;	**************** LOAD OPTION TWO
 ;************************************************************
 		load_option_two:
+				xor ax,ax
+				mov ds,ax
 
 				mov	ax, 0x000007E0  ;0x00007E00
 				mov	es, ax
 				xor	bx, bx          ;  set on BX the address of our code at PC Memory
 
-				mov	ah, 0xD					; Interrupt that read sectors into Memory
+				mov	ah, 0x02					; Interrupt that read sectors into Memory
 														; this interrupt use all of registers below
 				mov	ch, 0x0				  ; Cylinder number
-				mov	al, 0xA					; Number of sectors to read
-				mov	cl, 0x03				; Sector to read.
+				mov	al, 0x02					; Number of sectors to read
+				mov	cl, 0x20				; Sector to read.
 				mov	dh, 0x0				  ; Head number
 				mov dl, 0x0		      ; Drive number
 				int	0x13					  ; DISK interrupt
-		ret
+
+				jc load_option_two
+
+				jmp	0x000007E00			  ; jump to execute the kernel 2
 
 ;************************************************************
 ;	**************** SHUTDOWN COMPUTER
@@ -286,7 +297,3 @@ shutdown:
 		mov bx,0x0001
 		mov cx,0x0003
 		int 0x15
-
-end;
-		jmp $
-; jmp 0x00007E00

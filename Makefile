@@ -16,21 +16,22 @@ disk=disk.img
 blockSize=512
 diskSize=100
 # Settings of stage one Block on Disk
-stage1Head=1
-stage1BlocksSize=1
+#stage1Seek=0
+#stage1BlocksSize=1
 # Settings of stage two Block on Disk
-stage2Head=1
-stage2BlocksSize=2
+#stage2Seek=1
+#stage2BlocksSize=2
 # Settings of kernel on Disk
-kernelHead=3
-kernelBlockSize=10
+#kernel1Seek=2
+#kernel2Seek=20
+#kernelBlockSize=10
 
 #
 #				Settings of Files
 #
 stage1=boot
 stage2=bootStage2
-kernel=kernel1
+kernel1=kernel1
 kernel2=kernel2
 #
 #				Settings of Kernel
@@ -53,20 +54,17 @@ make_disk:
 compiles:
 		nasm -f bin $(stage1).asm -o $(stage1).bin
 		nasm -f bin $(stage2).asm -o $(stage2).bin
-		nasm $(ASMFLAGS) $(kernel).asm -o $(kernel).bin
-		nasm $(ASMFLAGS) $(kernel2).asm -o $(kernel2).bin
+		nasm -f bin $(kernel1).asm -o $(kernel1).bin
+		nasm -f bin $(kernel2).asm -o $(kernel2).bin
 
 writing_on_disk:
 		dd if=$(stage1).bin of=$(disk) bs=$(blockSize) count=1 conv=notrunc status=noxfer
-		dd if=$(stage2).bin of=$(disk) bs=$(blockSize) seek=$(stage2Head) count=$(stage2BlocksSize) conv=notrunc status=noxfer
-		dd if=$(kernel).bin of=$(disk) bs=$(blockSize) seek=$(kernelHead) count=$(kernelBlockSize) conv=notrunc
-		dd if=$(kernel2).bin of=$(disk) bs=$(blockSize) seek=$(kernelHead) count=$(kernelBlockSize) conv=notrunc
+		dd if=$(stage2).bin of=$(disk) bs=$(blockSize) seek=1 count=3 conv=notrunc status=noxfer
+		dd if=$(kernel1).bin of=$(disk) bs=$(blockSize) seek=4 count=10 conv=notrunc
+		dd if=$(kernel2).bin of=$(disk) bs=$(blockSize) seek=14 count=10 conv=notrunc
 
 hexdump:
 		hexdump $(file)
-
-disasm:
-		ndisasm $(stage1).asm
 
 launch_qemu:
 		qemu-system-i386 -fda $(disk)
