@@ -42,6 +42,7 @@ start:
 			je .endprintstring
 
 			mov ah,0xe									; instruction to show on screen
+			mov bl, 0xf
 			int 0x10										; call video interrupt
 
 		jmp print_string
