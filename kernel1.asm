@@ -16,14 +16,21 @@ head dw 0
 
 
 _start:
+	xor ax, ax		;ax to 0
+	mov ds, ax		;ds to 0
+
+	mov al, 'b'
+	mov ah,0xe			;print char in al
+	mov bl,0xf			;char color (white)
+	int 10h	
+
 	.random:
 		mov ah, 0
 		int 0x1A
-		mov word[rand], dx
+		mov word[rand], dx 	;gets the seed for the random function from the clock and saves in the variable "rand"
 
 	.init:
-		xor ax, ax		;zera ax
-		
+		xor ax, ax
 		mov es, ax		;zera es
 		mov di,	number 	;coloca number em di
 		stosw 			;manda ax (0) para es:di (number)
@@ -39,19 +46,6 @@ _start:
 		
 	game:
 		call random 		;makes bl a random number between 1 and 4 and bh == 0
-		;push bx
-
-		; push bx
-		; inc bx
-		; push bx
-		; inc bx
-		; push bx
-		; inc bx
-		; push bx
-		; inc bx
-		; push bx
-		; inc bx
-		; push bx
 
 		mov word[stack], sp
 		.show_sequence:
@@ -126,7 +120,7 @@ _start:
 		mov sp, ds				;restaura stack
 		times 10 call delay		;chama delay 10 vezes (5 segundos)
 
-		jmp start
+		jmp _start
 
 
 ;-----------------------------------------------------------------------------------;
@@ -144,16 +138,10 @@ inc_score:	;incrementa score
 ret
 
 delay:		;delay de .5 segundos			
-	;push ax			;salve ax
-	;push cx			;salve cx
-	;push dx			;salve dx
 	mov AH, 86h		;wait
 	mov CX, 001Ah		;high order word
 	mov DX, 011Ah	;cx:dx == 7A120
 	int 15h			;interrupt 
-	;pop dx			;restore dx
-	;pop cx			;restore cx
-	;pop ax			;restore ax
 ret
 
 show_color: 			;mostra cor em bl
