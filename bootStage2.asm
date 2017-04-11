@@ -16,11 +16,11 @@ topText: db '                   Welcome to Awesome-Bootloader ', 13, 10, 0
 botText: db '                Awesome-Bootloader by BootloaderBros ', 13, 10, 0
 option1: db ' > Lenux ', 13, 10, '   Ruindows ', 13, 10, 0
 option2: db '   Lenux ', 13, 10, ' > Ruindows ', 13, 10, 0
-loading_messages: db ' Verifying disks...', 13, 10, ' Scanning I/O devices...', 13, 10,' Status of your Screen...  OK!', 13, 10, ' Local Area Network (LAN)... OK!', 13, 10, ' Keyboard & Mouse... OK!', 13, 10, ' University Accomplishments... OK!', 13, 10,  ' Social life...', 13, 10,' ..............', 13, ' ____ERROR!____', 13, 10, ' Loading some things...', 13, 10,' Loading another things...', 13, 10, ' Loading stranger things.', 13, 10, ' Are you reading what we are loading?', 13, 10, ' Loading something dark (your debts). MuaHaHaHa', 13, 10, ' DEBT_LOADER_PROC Terminated. Insufficient memory.', 13, 10, ' Scanning your heart rate...', 13, 10, ' Are you nervous?', 13, 10, ' Starting the Dual-Boot Manager...', 0
+loading_messages: db ' Verifying disks...', 13, 10, ' Scanning I/O devices...', 13, 10,' Status of your Screen...  OK!', 13, 10, ' Local Area Network (LAN)... OK!', 13, 10, ' Keyboard & Mouse... OK!', 13, 10, ' University Accomplishments... OK!', 13, 10,  ' Social life... FATAL ERROR!', 13, 10, ' Loading some things...', 13, 10,' Loading another things...', 13, 10, ' Loading stranger things.', 13, 10, ' Are you reading what we are loading?', 13, 10, ' Loading something dark (your debts). MuaHaHaHa', 13, 10, ' DEBT_LOADER_PROC Terminated. Insufficient memory.', 13, 10, ' Scanning your heart rate...', 13, 10, ' Are you nervous?', 13, 10, ' Starting the Dual-Boot Manager...', 0
 
 ;
 ;		On the map of memory, 0x00500 has 32kb
-;			Our kernel, will be load on 0x00007E00 tha has 480.5kb
+;		Our kernel, will be load on 0x00007E00 tha has 480.5kb
 ;
 
 start:
@@ -185,7 +185,7 @@ start:
 
 			cmp al, 13									; compare al with 13 (to call delay)
 			jne .no_delay
-					times 2 call delay
+					call delay
 
 			.no_delay:
 					cmp al, 0										; compare al with 0 (0, was set as end of string)
