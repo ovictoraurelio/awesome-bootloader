@@ -22,8 +22,9 @@ string16 db "*** atp.samara (Address F77E43C9 base at F77X2000, Datestamp 3b7d83
 string17 db "Collecting data for crash dump...", 13, 10
 string18 db "Beginning dump of physical memory...", 13, 10
 string19 db "Physical memory dump complete.", 13, 10
-string20 db "Contact your system administrator or technical support group for further", 13, 10
-string21 db "assistance.", 13, 10, 0
+string20 db "Contact your system administrator or technical support group for assistance.", 13, 10
+string21 db 13, 10
+string22 db "Press ESC to shutdown your computer.", 0
 
 _start:					;inicio da main
 	mov ax, 0
@@ -41,6 +42,14 @@ _start:					;inicio da main
 	mov si, string ;ponteiro pra string
 	call print_string
 	int 10h
+
+	.keyboard_read:
+		mov ah, 0x0				;instruction to read from keyboard
+		int 0x16				;keyboard interrupt
+
+		cmp al, 0x1b			;CMP with ESC
+		je end				;shutdown computer
+	jmp .keyboard_read 		;loop again
 
 jmp end					;fim da main
 
@@ -65,3 +74,8 @@ print_char:				;Função de printar caractere na tela
 ret
 
 end:
+	;Turn off the system
+	mov ax,0x5307
+	mov bx,0x0001
+	mov cx,0x0003
+	int 0x15
