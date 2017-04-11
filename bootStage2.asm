@@ -26,6 +26,7 @@ loading_messages: db ' Veryfing disks. ', 13, 10, ' Searching for i/o devices. '
 start:
 		xor ax, ax
 		mov ds, ax
+		int 13h
 
 		;******************************
 		;	** Loading Screen
@@ -74,7 +75,8 @@ start:
 		;******************************
 		boot_selected:
 
-				mov ah,0x3 											; to read current cursor position
+				mov ah,0x3 											; to read load_option_twocurrent cursor position
+				mov bh, 0
 				int 0x10
 
 				cmp dh, 09											; if line of cursor is 9, this boot selection is the first
@@ -240,6 +242,7 @@ start:
 
 				xor ax,ax
 				mov ds,ax
+				int 13h
 
 				mov ax, 0x07E0
 				mov es, ax
@@ -247,16 +250,16 @@ start:
 
 				mov	ah, 0x02				; Interrupt that read sectors into Memory
 														; this interrupt use all of registers below
-				mov	al, 0x0A				; Number of sectors to read
+				mov	al, 0x3				; Number of sectors to read
 				mov	ch, 0x00			  ; Cylinder number
-				mov	cl, 0x04				; Sector to read.
+				mov	cl, 0x5				; Sector to read.
 				mov	dh, 0x0				  ; Head number
 				mov dl, 0x0		      ; Drive number
 				int	0x13					  ; DISK interrupt
 
 		jc load_option_one		; se leu com sucesso, pula para o endereço do kernel (ES:00)
 
-	jmp 0x000007E00  ; jump to execute the kernel 1
+	jmp 0x7E00  ; jump to execute the kernel 1
 
 ;************************************************************
 ;	**************** LOAD OPTION TWO
@@ -264,23 +267,24 @@ start:
 		load_option_two:
 				xor ax,ax
 				mov ds,ax
+				int 13h
 
-				mov	ax, 0x000007E0  ;0x00007E00
+				mov	ax, 0x07E0  ;0x00007E00
 				mov	es, ax
 				xor	bx, bx          ;  set on BX the address of our code at PC Memory
 
 				mov	ah, 0x02					; Interrupt that read sectors into Memory
 														; this interrupt use all of registers below
+				mov	al, 0x3					; Number of sectors to read
 				mov	ch, 0x0				  ; Cylinder number
-				mov	al, 0x02					; Number of sectors to read
-				mov	cl, 0x20				; Sector to read.
+				mov	cl, 0x8				; Sector to read.
 				mov	dh, 0x0				  ; Head number
 				mov dl, 0x0		      ; Drive number
 				int	0x13					  ; DISK interrupt
 
 				jc load_option_two
 
-				jmp	0x000007E00			  ; jump to execute the kernel 2
+				jmp	0x7E00			  ; jump to execute the kernel 2
 
 ;************************************************************
 ;	**************** SHUTDOWN COMPUTER
