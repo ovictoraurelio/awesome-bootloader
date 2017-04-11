@@ -1,11 +1,11 @@
-org 0x7c00
-jmp 0x0000:start
+org 0x7e00
+jmp _start
 
 score dw 0
 highscore dw 0
 game_over_msg db "Game Over!" ; tamanho = 10
 score_msg db "Your score is: " ;tamanho = 15
-highscore_msg db "The high_score is: " ;tamanho = 19
+highscore_msg db "The High Score is: " ;tamanho = 19
 number times 2 db 0
 dez db 10
 rand dw 0
@@ -15,7 +15,7 @@ stack dw 0
 head dw 0
 
 
-start:
+_start:
 	.random:
 		mov ah, 0
 		int 0x1A
@@ -214,14 +214,8 @@ random:
 	add ax, cx
 	;xor ah, ah
 	mov word[rand], ax	;updates seed
-	and al, 00000011b	;same as al = al%4
+	and al, 11b			;same as al = al%4
 	inc al				;a1 = [1, 4]
 	mov bl, al			;bl = ah
 	xor bh, bh 			;bx  ==  bl
 ret
-
-
-jmp $
-
-times 510 - ($ - $$) db 0
-dw 0xaa55
