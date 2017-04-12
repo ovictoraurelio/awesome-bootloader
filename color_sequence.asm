@@ -3,15 +3,16 @@ jmp 0x0000:_start
 ;Variable declaration area
 score dw 0
 highscore dw 0
-game_over_msg db "Game Over!" ; tamanho = 10
-score_msg db "Your score is: " ;tamanho = 15
-highscore_msg db "The High Score is: " ;tamanho = 19
+game_over_msg db "Game Over!", 0
+score_msg db "Your score is: ", 0
+highscore_msg db "The High Score is: ", 0
 number times 2 db 0
 ten db 10
 rand dw 0
 i db 0
 sequence times 40 db 0 
 head dw 0
+color_array times 50 db 0
 
 _start:
 	xor ax, ax		;ax to 0
@@ -21,15 +22,29 @@ _start:
 	mov ah,0xe		;print char in al
 	mov bl,0xf		;char color (white)
 	int 10h
+	
 	call delay
 
 	.random:
-		mov ah, 0
+		mov ah, 0x2
 		int 0x1A
-		mov word[rand], dx 	;gets the seed for the random function from the clock and saves in the variable "rand"
+		xor ch, ch
+		mov word[rand], cx 	;gets the seed for the random function from the clock and saves in the variable "rand"
 
+	;print int
 	mov ax, word[rand]
 	call print_int
+	
+	call delay
+
+	.video_mode:
+		mov ah, 0 ;numero da chamada
+		mov al, 12h ;modo de video
+		int 10h
+	
+	call delay
+
+
 
 jmp end
 
