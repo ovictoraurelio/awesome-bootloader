@@ -9,10 +9,13 @@ highscore_msg db "The High Score is: ", 0
 number times 2 db 0
 ten db 10
 rand dw 0
+rand_num dw 0
+rand_num1 dw 0
 i db 0
 sequence times 40 db 0 
 head dw 0
 color_array times 50 db 0
+color_array_cursor db 0
 
 _start:
 	xor ax, ax		;ax to 0
@@ -25,11 +28,9 @@ _start:
 	
 	call delay
 
-	.random:
-		mov ah, 0x2
-		int 0x1A
-		xor ch, ch
-		mov word[rand], cx 	;gets the seed for the random function from the clock and saves in the variable "rand"
+	mov al, 0xa
+	mov ah,0xe		;print char in al
+	int 10h
 
 	;print int
 	mov ax, word[rand]
@@ -37,15 +38,54 @@ _start:
 	
 	call delay
 
+	
+
 	.video_mode:
 		mov ah, 0 ;numero da chamada
 		mov al, 12h ;modo de video
 		int 10h
 	
 	call delay
+;--------------------------------------------------------------------------------------------------;
+;---------------------------------------------Working Area-----------------------------------------;
+;--------------------------------------------------------------------------------------------------;
+	game:
+		call random 		;makes bl a random number between 1 and 4 and bh == 0
 
+		mov al, 0xa
+		mov ah,0xe		;print char in al
+		int 10h
 
+		mov ax, bx
+		call print_int
 
+		call delay
+	jmp game 
+
+		; .show_sequence:
+		; 	pop bx 				
+		; 	cmp bx, 0			;compara bx com 0
+		; 	je get_answer		;se for igual vá para get answer
+		; 	call show_color		;muda background pra cor q está em bl
+		; 	call delay			;delay
+		; 	jmp .show_sequence	;recomeça
+
+		; ;GERSON
+		; ;mostra mensagem pra pedir sequencia invertida
+		; get_answer:
+		; 	mov sp, word[stack]
+		; 	times 4 call delay			;delay
+		; 	jmp game
+
+		; .next_level:
+		; 	;print next level message
+		; 	call inc_score	;incrementa score
+		; 	mov ax, word[score]
+		; 	cmp ax, word[highscore]
+		; 	jg game
+		; 	inc word[highscore]
+		; 	jmp game
+;--------------------------------------------------------------------------------------------------;
 jmp end
 
 ;-------------------------------------------------;
@@ -80,6 +120,35 @@ ret	;else, return
 ;-------------------------------------------------;
 ;--------------Auxiliary functions----------------;
 ;-------------------------------------------------;
+
+;This function returns a randomized value in bx and uses the value in [rand] as a seed
+random:
+	mov ah, 0x2
+	int 0x1A
+	xor ch, ch
+	add cl, dh
+	mov word[rand], cx 	;gets the seed for the random function from the clock and saves in the variable "rand"
+
+	mov ax, word[rand]	;seed 1
+	mov dx, word[rand_num1] ;seed 2
+	mov cx, word[rand_num]	;seed 3	
+
+	mov bx, dx
+	xor bx, cx
+	mov word[rand_num1], cx
+	mov word[rand_num], bx
+
+	inc word[rand_num]
+	mul dx
+	add ax, cx
+	;xor ah, ah
+	mov word[rand], ax	;updates seed
+	and al, 11b			;same as al = al%4
+	inc al				;a1 = [1, 4]
+	mov bl, al			;bl = ah
+	xor bh, bh 			;bx  ==  bl
+ret
+
 delay:				;0.5 sec delay			
 	mov AH, 86h		;wait
 	mov CX, 001Ah	;high order word
