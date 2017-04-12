@@ -7,11 +7,10 @@ game_over_msg db "Game Over!" ; tamanho = 10
 score_msg db "Your score is: " ;tamanho = 15
 highscore_msg db "The High Score is: " ;tamanho = 19
 number times 2 db 0
-dez db 10
+ten db 10
 rand dw 0
 i db 0
 sequence times 40 db 0 
-stack dw 0
 head dw 0
 
 
@@ -207,3 +206,5 @@ random:
 	mov bl, al			;bl = ah
 	xor bh, bh 			;bx  ==  bl
 ret
+
+end:
