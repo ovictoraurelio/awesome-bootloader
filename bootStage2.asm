@@ -14,8 +14,8 @@ jmp start
 
 topText: db '                   Welcome to Awesome-Bootloader ', 13, 10, 0
 botText: db '                Awesome-Bootloader by BootloaderBros ', 13, 10, 0
-option1: db ' > Lenux ', 13, 10, '   Ruindows ', 13, 10, 0
-option2: db '   Lenux ', 13, 10, ' > Ruindows ', 13, 10, 0
+option1: db ' > Lenux-based Color Sequence Game ', 13, 10, '   Ruindows ', 13, 10, 0
+option2: db '   Lenux-based Color Sequence Game ', 13, 10, ' > Ruindows ', 13, 10, 0
 loading_messages: db ' Verifying disks...', 13, 10, ' Scanning I/O devices...', 13, 10,' Status of your Screen...  OK!', 13, 10, ' Local Area Network (LAN)... OK!', 13, 10, ' Keyboard & Mouse... OK!', 13, 10, ' University Accomplishments... OK!', 13, 10,  ' Social life... FATAL ERROR!', 13, 10, ' Loading some things...', 13, 10,' Loading another things...', 13, 10, ' Loading stranger things.', 13, 10, ' Are you reading what we are loading?', 13, 10, ' Loading something dark (your debts). MuaHaHaHa', 13, 10, ' DEBT_LOADER_PROC Terminated. Insufficient memory.', 13, 10, ' Scanning your heart rate...', 13, 10, ' Are you nervous?', 13, 10, ' Starting the Dual-Boot Manager...', 0
 
 ;
@@ -94,7 +94,7 @@ start:
 				call show_menu_template
 				mov si, loading_messages
 				call print_string_with_delay_on_breakline
-				times 4 call delay
+				times 2 call delay
 		ret
 
 ;************************************************************
@@ -222,17 +222,10 @@ start:
 ;	**************** DELAY
 ;************************************************************
 		delay:
-				pusha												; saving on stack my registers
-				mov bp, 2000								; set this register with 3000
-				mov si, 2000
-				.delay2:
-						dec bp
-						nop
-						jnz .delay2
-						dec si
-						cmp si,0
-						jnz .delay2
-				popa
+			mov ah, 86h		;wait
+			mov cx, 1Ah		;high order word
+			mov dx, 1Ah		;cx:dx == 7A120
+			int 15h			;interrupt
 		ret
 
 ;************************************************************
@@ -250,7 +243,7 @@ start:
 
 				mov	ah, 0x02				; Interrupt that read sectors into Memory
 														; this interrupt use all of registers below
-				mov	al, 0x3				; Number of sectors to read
+				mov	al, 0x5				; Number of sectors to read
 				mov	ch, 0x00			  ; Cylinder number
 				mov	cl, 0x5				; Sector to read.
 				mov	dh, 0x0				  ; Head number
@@ -277,7 +270,7 @@ start:
 														; this interrupt use all of registers below
 				mov	al, 0x3					; Number of sectors to read
 				mov	ch, 0x0				  ; Cylinder number
-				mov	cl, 0x8				; Sector to read.
+				mov	cl, 0xa				; Sector to read.
 				mov	dh, 0x0				  ; Head number
 				mov dl, 0x0		      ; Drive number
 				int	0x13					  ; DISK interrupt
