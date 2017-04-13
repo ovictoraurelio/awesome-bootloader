@@ -7,7 +7,9 @@ highscore dw 0
 game_over_msg db "Game Over!", 0
 score_msg db "Your score is: ", 0
 highscore_msg db "The High Score is: ", 0
-menu_message db 13, 10, 13, 10, 13, 10, "             Welcome to the Lenux-based Color Sequence Game!", 13, 10, 13, 10, 13, 10, "Press Enter to start or ESC to leave"
+menu_message db "             Welcome to the Lenux-based Color Sequence Game!", 13, 10, 13, 10, 0
+game_instructions db " Instructions:", 13, 10,"  Look carefully to the screen and memorize the color order.", 13, 10,"  Insert the order according to:", 13, 10, "     1 - Blue", 13, 10, "     2 - Green", 13, 10, "     3 - Cyan", 13, 10, "     4 - Red",0
+control_instructions db 13, 10, 13, 10, 13, 10, 13, 10, 13, 10, 13, 10, 13, 10, 13, 10, 13, 10, 13, 10, 13, 10, 13, 10, 13, 10, 13, 10, 13, 10, 13, 10, 13, 10, 13, 10, "                 Press Enter to start or ESC to leave", 0
 number times 2 db 0
 ten db 10
 rand dw 0
@@ -38,14 +40,32 @@ _start:
 	call show_color
 
 	mov si, menu_message
+	call print_string
+
+	mov si, game_instructions
 	call print_string	
 
-	times 3 call delay
-	call clear_screen
+	mov si, control_instructions
+	call print_string	
+
+	menu_control:
+		mov ah, 0x0								;instruction to read from keyboard
+		int 0x16								;interrupt de teclado
+
+		enter_cmp:
+			cmp al, 0xd							;CMP with ENTER
+			je game								;if equal, start game
+		esc_cmp:
+			cmp al, 0x1b						;CMP with ESC
+			je end								;if equal, end game and shutdown computer
+	jmp menu_control 							;else, reads again
+
 ;--------------------------------------------------------------------------------------------------;
 ;---------------------------------------------Working Area-----------------------------------------;
 ;--------------------------------------------------------------------------------------------------;
 	game:
+		;times 3 call delay
+		call clear_screen
 		mov di, queue_front
 		game_loop:
 			call random 				;makes bl a random number between 1 and 4 and bh == 0
