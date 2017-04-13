@@ -6,6 +6,7 @@ highscore dw 0
 game_over_msg db "Game Over!", 0
 score_msg db "Your score is: ", 0
 highscore_msg db "The High Score is: ", 0
+menu_message db 13, 10, 13, 10, 13, 10, "             Welcome to the Lenux-based Color Sequence Game!", 13, 10, 13, 10, 13, 10, "Press Enter to start or ESC to leave"
 number times 2 db 0
 ten db 10
 rand dw 0
@@ -14,82 +15,88 @@ rand_num1 dw 0
 i db 0
 sequence times 40 db 0 
 head dw 0
-queue_front times 50 db 0
-queue_rear db 0
-queue_cursor db 0
+queue_front times 50 db 0 	;points to the initial memory address, holds the color values
+queue_rear dd 0 	;Holds the memory address of the end of the queue 
+queue_cursor dd 0 
 
 _start:
 	xor ax, ax		;ax to 0
 	mov ds, ax		;ds to 0
 
-	mov bx, [queue_front] 	;saves the memory adress of queue_front in bx
-	mov [queue_cursor], bx	;saves the memory adress of bx in queue_cursor 
-	mov [queue_rear], bx		;saves the memory adress of bx in queue_rear
+	; mov es, queue_front 	;saves the memory adress of queue_front in ES:SI
+	; mov dword[queue_cursor], bx	;saves the memory adress of queue_front in queue_cursor 
+	; mov dword[queue_rear], bx	;saves the memory adress of queue_front in queue_rear
 
 	.video_mode:
-		mov ah, 0 ;numero da chamada
-		mov al, 12h ;modo de video
+		mov ah, 0 	;call number
+		mov al, 12h ;video mode
 		int 10h
 
-	call delay
+	;Game menu
+	mov bl, 0x7 	;sets the screen color as dark grey
+	call show_color
+
+	mov si, menu_message
+	call print_string	
+
+	times 3 call delay
+	call clear_screen
 ;--------------------------------------------------------------------------------------------------;
 ;---------------------------------------------Working Area-----------------------------------------;
 ;--------------------------------------------------------------------------------------------------;
 	game:
-		call random 				;makes bl a random number between 1 and 4 and bh == 0
-		mov byte[queue_rear], bl	;saves the randomly-generated value in the end of the queue
+		mov di, queue_front
+		game_loop:
+			call random 				;makes bl a random number between 1 and 4 and bh == 0
+			mov al, bl 					
+			cld 						;clears the direction flag so the "cursor" will go forward
+			stosb 						;loads the randomly-generated value(in al) into the memory and points to next memory position
+			
+			; mov bl, [di - 1] 			;saves the queue[di - 1] value in bl, because queue[di] will always be 0
+			; call show_color			;changes the background to the color which is in bl
+			; call delay
 
-		mov bl, byte[queue_rear]
-		call show_color		;muda background pra cor q está em bl
-		call delay
+			; mov bl, [di - 1]
+			; xor bh, bh
+			; mov ax, bx
+			; call print_int
+			; call delay 
 
-		mov cl, queue_rear  
-		inc cl 				;increments the queue_rear, points to the next memory address
-		mov [queue_cursor], cl
+			; mov ah,0xe		;print char in al
+			; mov al, 0xa 	;new line character
+			; int 10h
 
-		mov bl, byte[queue_rear]
-		xor bh, bh
-		mov ax, bx
-		call print_int
-		call delay 
+			.show_sequence:
+				mov si, queue_front
+				.loop:
+					lodsb 				;gets the value in queue[si] and saves in al, then points si to the next position
+					mov bl, al 			 
+					cmp bl, 0			;compares bl with 0, to know if it reached the end of the numbers
+					je get_answer		;if its equal go to get_answer				
+					
+					call show_color		;else, changes the background to the color which is in bl
+					call delay			;delay
+				jmp .loop				;loads the next memory position (next color)
 
+			; ;GERSON
+			; ;mostra mensagem pra pedir sequencia invertida
+			get_answer:
+				mov al, 'b'
+				mov ah,0xe		;print char in al
+				mov bl,0xf		;char color (white)
+				int 10h
 
-		mov al, 0xa
-		mov ah,0xe		;print char in al
-		int 10h
+				times 2 call delay			;delay
+				jmp game_loop
 
-
-		; .show_sequence:
-		; 	mov bh, byte[queue_cursor] 
-		; 	mov byte[queue_front], bh
-		; 	.loop:
-		; 		mov bl, byte[queue_cursor] 
-		; 		cmp bl, 0			;compara bx com 0
-		; 		je get_answer		;se for igual vá para get answer
-		; 		add byte[queue_cursor], 1  				
-		; 		call show_color		;muda background pra cor q está em bl
-		; 		call delay			;delay
-		; 	jmp .loop				;recomeça
-
-		; ;GERSON
-		; ;mostra mensagem pra pedir sequencia invertida
-		; get_answer:
-		; 	mov al, 'b'
-		; 	mov ah,0xe		;print char in al
-		; 	mov bl,0xf		;char color (white)
-		; 	int 10h
-
-		; 	times 2 call delay			;delay
-		; 	jmp game
-
-		; .next_level:
-		; 	;print next level message
-		; 	call inc_score	;incrementa score
-		; 	mov ax, word[score]
-		; 	cmp ax, word[highscore]
-		; 	ja game
-		; 	inc word[highscore]
-			jmp game
+			; .next_level:
+			; 	;print next level message
+			; 	call inc_score	;incrementa score
+			; 	mov ax, word[score]
+			; 	cmp ax, word[highscore]
+			; 	ja game
+			; 	inc word[highscore]
+				jmp game
 ;--------------------------------------------------------------------------------------------------;
 jmp end
 
@@ -169,6 +176,21 @@ delay:				;0.5 sec delay
 	int 15h			;interrupt 
 ret
 
+;Save the string in si before using this function.
+print_string:			;Função de printar string na tela
+		lodsb				;al = string[si++]
+		cmp al, 0			;if(char == '\0')
+		je fim_print		;then go to fim_print
+		call print_char		;else go to print_char
+	jmp print_string		;loop again
+
+	fim_print:				;return
+		mov al, 10			
+		call print_char		;printa a new line
+		mov al, 13			
+		call print_char		;printa o carriage return
+ret
+
 ;Save the char in the reg al before using this function.
 print_char:				;Função de printar caractere na tela
 	mov ah,0xe			;Codigo da instrucao de imprimir um caractere que esta em al
@@ -180,6 +202,12 @@ show_color: 			;mostra cor em bl
 	mov ah, 0xb 		;numero da chamada
 	mov bh, 0  			;id da paleta de cores
 	int 10h				;video interrupt		
+ret
+
+clear_screen:
+    mov ah, 0 	;call number
+    mov al, 12h ;video mode
+    int 10h
 ret
 
 end:
