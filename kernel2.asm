@@ -34,6 +34,8 @@ _start:					;inicio da main
 	mov al, 12h ;modo de video
 	int 10h
 
+	call delay
+
 	mov ah, 0xb ;numero da chamada
 	mov bh, 0  ;id da paleta de cores
 	mov bl, 0x1 ;cor azul
@@ -52,6 +54,13 @@ _start:					;inicio da main
 	jmp .keyboard_read 		;loop again
 
 jmp end					;fim da main
+
+delay:				;0.5 sec delay			
+	mov AH, 86h		;wait
+	mov CX, 001Ah	;high order word
+	mov DX, 011Ah	;cx:dx == 7A120
+	int 15h			;interrupt 
+ret
 
 print_string:			;Função de printar string na tela
 	lodsb				;al = string[si++]
