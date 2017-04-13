@@ -7,10 +7,13 @@ highscore dw 0
 game_over_msg db "Game Over!", 0
 score_msg db "Your score is: ", 0
 highscore_msg db "The High Score is: ", 0
+answer_message db " Enter the sequence, then press Enter.", 13, 10, 13, 10, " ", 0
+next_level_message db " C", 10, 10," O", 10, 10," N", 10, 10, " G", 10, 10, " R", 10, 10, " A", 10, 10, " T", 10, 10, " U", 10, 10, " L            YOU ARE IN THE NEXT LEVEL!!!",8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8, 10, 10, " A", 10,  10," T", 10,  10," I", 10, 10, " O", 10, 10, " N", 10, 10, " S",0 
 menu_message db "             Welcome to the Lenux-based Color Sequence Game!", 13, 10, 13, 10, 0
-game_instructions db " Instructions:", 13, 10,"  Look carefully to the screen and memorize the color order.", 13, 10,"  Insert the order according to:", 13, 10, "     1 - Blue", 13, 10, "     2 - Green", 13, 10, "     3 - Cyan", 13, 10, "     4 - Red",0
-control_instructions db 13, 10, 13, 10, 13, 10, 13, 10, 13, 10, 13, 10, 13, 10, 13, 10, 13, 10, 13, 10, 13, 10, 13, 10, 13, 10, 13, 10, 13, 10, 13, 10, 13, 10, 13, 10, "                 Press Enter to start or ESC to leave", 0
+game_instructions db " Instructions:", 13, 10,"  Look carefully to the screen and memorize the color order.", 13, 10,"  Insert the order according to:", 13, 10, "     1 - Blue", 13, 10, "     2 - Green", 13, 10, "     3 - Cyan", 13, 10, "     4 - Red",13, 10, "     Ignore - Black",0
+control_instructions db 13, 10, 13, 10, 13, 10, 13, 10, 13, 10, 13, 10, 13, 10, 13, 10, 13, 10, 13, 10, 13, 10, 13, 10, 13, 10, 13, 10, 13, 10, 13, 10, 13, 10, "                 Press Enter to start or ESC to leave", 0
 number times 2 db 0
+answer db 0
 ten db 10
 rand dw 0
 rand_num dw 0
@@ -19,16 +22,10 @@ i db 0
 sequence times 40 db 0 
 head dw 0
 queue_front times 50 db 0 	;points to the initial memory address, holds the color values
-queue_rear dd 0 	;Holds the memory address of the end of the queue 
-queue_cursor dd 0 
 
 _start:
 	xor ax, ax		;ax to 0
 	mov ds, ax		;ds to 0
-
-	; mov es, queue_front 	;saves the memory adress of queue_front in ES:SI
-	; mov dword[queue_cursor], bx	;saves the memory adress of queue_front in queue_cursor 
-	; mov dword[queue_rear], bx	;saves the memory adress of queue_front in queue_rear
 
 	.video_mode:
 		mov ah, 0 	;call number
@@ -59,20 +56,21 @@ _start:
 			cmp al, 0x1b						;CMP with ESC
 			je end								;if equal, end game and shutdown computer
 	jmp menu_control 							;else, reads again
-
+	xor di, di
+	xor si, si
 ;--------------------------------------------------------------------------------------------------;
 ;---------------------------------------------Working Area-----------------------------------------;
 ;--------------------------------------------------------------------------------------------------;
 	game:
-		;times 3 call delay
 		call clear_screen
 		mov di, queue_front
 		game_loop:
 			call random 				;makes bl a random number between 1 and 4 and bh == 0
 			mov al, bl 					
-			cld 						;clears the direction flag so the "cursor" will go forward
-			stosb 						;loads the randomly-generated value(in al) into the memory and points to next memory position
 			
+			mov [di], bl
+			inc di
+
 			; mov bl, [di - 1] 			;saves the queue[di - 1] value in bl, because queue[di] will always be 0
 			; call show_color			;changes the background to the color which is in bl
 			; call delay
@@ -86,6 +84,7 @@ _start:
 			; mov ah,0xe		;print char in al
 			; mov al, 0xa 	;new line character
 			; int 10h
+			; jmp game_loop
 
 			.show_sequence:
 				mov si, queue_front
@@ -97,27 +96,68 @@ _start:
 					
 					call show_color		;else, changes the background to the color which is in bl
 					call delay			;delay
+
+					mov bl, 0 			;puts a black screen between the colors
+					call show_color
+					call mini_delay
 				jmp .loop				;loads the next memory position (next color)
 
 			; ;GERSON
 			; ;mostra mensagem pra pedir sequencia invertida
 			get_answer:
-				mov al, 'b'
-				mov ah,0xe		;print char in al
-				mov bl,0xf		;char color (white)
-				int 10h
+				mov bl, 7  			;sets the screen as grey
+				call show_color
+				
+				mov si, answer_message 	;displays the get_answer message
+				call print_string
 
+				mov si, queue_front
+				.answer:
+					mov al, ' ' 		;prints a space between each number
+					call print_char
+					
+					mov ah, 0x0			;instruction to read from the keyboard
+					int 0x16			;keyboard interrupt
+					
+					add al, -48 		;transforms the ascii char into a number
+					mov byte[answer], al;saves the answer from al
+					xor ah, ah
+					call print_int 
+
+					; mov al, 10
+					; call print_char
+					
+					; mov al, [si]
+					; xor ah, ah
+					; call print_int
+
+					mov al, [si]
+					inc si
+				
+					cmp al, 0			;compares al with 0, to know if it reached the end of the numbers
+					je .next_level 		;if its in the end, go to the next level
+					
+					cmp al, byte[answer];else, compares with the color
+					je .answer 			;if equal, go to the next color
+					call delay
+					jmp end 			;if wrong, finishes the game
+
+
+			.next_level:
+				call clear_screen
+				mov bl, 9
+				call show_color
+				mov si, next_level_message
+				call print_string
 				times 2 call delay			;delay
-				jmp game_loop
-
-			; .next_level:
+				call clear_screen
 			; 	;print next level message
 			; 	call inc_score	;incrementa score
 			; 	mov ax, word[score]
 			; 	cmp ax, word[highscore]
 			; 	ja game
 			; 	inc word[highscore]
-				jmp game
+	jmp game_loop
 ;--------------------------------------------------------------------------------------------------;
 jmp end
 
@@ -190,10 +230,17 @@ random:
 	xor bh, bh 			;bx  ==  bl
 ret
 
+mini_delay:			;0.5 sec delay			
+	mov ah, 86h		;wait
+	mov cx, 0x1	;high order word
+	mov dx, 0		;cx:dx == 7A120
+	int 15h			;interrupt 
+ret
+
 delay:				;0.5 sec delay			
-	mov AH, 86h		;wait
-	mov CX, 001Ah	;high order word
-	mov DX, 011Ah	;cx:dx == 7A120
+	mov ah, 86h		;wait
+	mov cx, 1Ah		;high order word
+	mov dx, 1Ah		;cx:dx == 7A120
 	int 15h			;interrupt 
 ret
 
