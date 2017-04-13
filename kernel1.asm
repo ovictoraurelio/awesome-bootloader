@@ -2,9 +2,8 @@ org 0x7e00
 jmp _start
 
 ;Variable declaration area
-score dw 0
-highscore dw 0
-game_over_msg db "Game Over!", 0
+score db 0
+game_over_msg db "                G   A   M   E       O   V   E   R   ! ! !", 0
 score_msg db "Your score is: ", 0
 highscore_msg db "The High Score is: ", 0
 answer_message db " Enter the sequence, then press Enter.", 13, 10, 13, 10, " ", 0
@@ -140,7 +139,7 @@ _start:
 					cmp al, byte[answer];else, compares with the color
 					je .answer 			;if equal, go to the next color
 					call delay
-					jmp end 			;if wrong, finishes the game
+					jmp  game_over		;if wrong, finishes the game
 
 
 			.next_level:
@@ -151,13 +150,32 @@ _start:
 				call print_string
 				times 2 call delay			;delay
 				call clear_screen
-			; 	;print next level message
-			; 	call inc_score	;incrementa score
-			; 	mov ax, word[score]
-			; 	cmp ax, word[highscore]
-			; 	ja game
-			; 	inc word[highscore]
-	jmp game_loop
+				inc byte[score]
+			jmp game_loop
+
+
+			game_over:
+				call clear_screen
+				mov bl, 4
+				call show_color
+				mov si, game_over_msg
+				call print_string
+
+				mov al, 13
+				call print_char
+
+				mov al, 10
+				call print_char
+
+				mov si, score_msg
+				call print_string
+
+				xor ah, ah
+				mov al, byte[score]
+				call print_int
+
+				times 2 call delay
+			jmp end
 ;--------------------------------------------------------------------------------------------------;
 jmp end
 
