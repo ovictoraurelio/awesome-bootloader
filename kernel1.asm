@@ -21,6 +21,9 @@ i db 0
 sequence times 40 db 0 
 head dw 0
 queue_front times 50 db 0 	;points to the initial memory address, holds the color values
+counter dw 0
+counter1 dw 0
+
 
 _start:
 	xor ax, ax		;ax to 0
@@ -42,8 +45,51 @@ _start:
 	call print_string	
 
 	mov si, control_instructions
-	call print_string	
+	call print_string
+;-----------------------------------------------------------------;
+	mov dx, 220 ;coordenada y do primeiro pixel
+	
+	mov al,0x1 ;cor do pixel (azul)
+	mov cx, 150
+	loopS:
+		push cx
+		call square_print
+		pop cx
+		loop loopS
 
+	mov dx, 220
+
+	mov byte[counter], 0
+	mov al,0x2 ;cor do pixel (verde)
+	mov cx, 150
+	loopS2:
+		push cx
+		call square_print2
+		pop cx
+		loop loopS2
+
+	mov dx, 220
+
+	mov byte[counter], 0
+	mov al,0x3 ;cor do pixel (cyan)
+	mov cx, 150
+	loopS3:
+		push cx
+		call square_print3
+		pop cx
+		loop loopS3
+
+	mov dx, 220
+
+	mov byte[counter], 0
+	mov al,0x4 ;cor do pixel (red)
+	mov cx, 150
+	loopS4:
+		push cx
+		call square_print4
+		pop cx
+		loop loopS4	
+;-----------------------------------------------------------------;
 	menu_control:
 		mov ah, 0x0								;instruction to read from keyboard
 		int 0x16								;interrupt de teclado
@@ -57,9 +103,7 @@ _start:
 	jmp menu_control 							;else, reads again
 	xor di, di
 	xor si, si
-;--------------------------------------------------------------------------------------------------;
-;---------------------------------------------Working Area-----------------------------------------;
-;--------------------------------------------------------------------------------------------------;
+	
 	game:
 		call clear_screen
 		mov di, queue_front
@@ -176,7 +220,6 @@ _start:
 
 				times 2 call delay
 			jmp end
-;--------------------------------------------------------------------------------------------------;
 jmp end
 
 ;-------------------------------------------------;
@@ -214,6 +257,68 @@ inc_score:	;incrementa score
 	inc ax			;ax++
 	mov di, score 	;coloca endereço de score em es
 	stosw 			;[score] = ax
+ret
+
+square_print:
+		add cx, [counter]	;printa na coordenada [dx,(cx + counter)]
+		mov WORD [counter], 20 ;coordenada x do primeiro pixel
+	.loop:
+		mov cx, [counter]
+		call pixel_print 
+		inc WORD [counter]	;(*counter)++
+		cmp WORD [counter], 150 ;if counter >= 100
+		jae .endloop	;jump to endloop
+		jmp .loop		;else restart the loop
+	.endloop:
+	inc dx
+ret
+
+square_print2:
+		add cx, [counter]	;printa na coordenada [dx,(cx + counter)]
+		mov WORD [counter], 170 ;coordenada x do primeiro pixel
+	.loop:
+		mov cx, [counter]
+		call pixel_print 
+		inc WORD [counter]	;(*counter)++
+		cmp WORD [counter], 310 ;if counter >= 100
+		jae .endloop	;jump to endloop
+		jmp .loop		;else restart the loop
+	.endloop:
+	inc dx
+ret
+
+square_print3:
+		add cx, [counter]	;printa na coordenada [dx,(cx + counter)]
+		mov WORD [counter], 330 ;coordenada x do primeiro pixel
+	.loop:
+		mov cx, [counter]
+		call pixel_print 
+		inc WORD [counter]	;(*counter)++
+		cmp WORD [counter], 470 ;if counter >= 100
+		jae .endloop	;jump to endloop
+		jmp .loop		;else restart the loop
+	.endloop:
+	inc dx
+ret
+
+square_print4:
+		add cx, [counter]	;printa na coordenada [dx,(cx + counter)]
+		mov WORD [counter], 490 ;coordenada x do primeiro pixel
+	.loop:
+		mov cx, [counter]
+		call pixel_print 
+		inc WORD [counter]	;(*counter)++
+		cmp WORD [counter], 630 ;if counter >= 100
+		jae .endloop	;jump to endloop
+		jmp .loop		;else restart the loop
+	.endloop:
+	inc dx
+ret
+
+pixel_print:
+	mov ah, 0Ch ;pixel na coordenada [dx, cx]
+	mov bh, 0
+	int 10h
 ret
 
 ;-------------------------------------------------;
