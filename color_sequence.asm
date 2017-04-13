@@ -14,67 +14,72 @@ rand_num1 dw 0
 i db 0
 sequence times 40 db 0 
 head dw 0
-color_array times 50 db 0
-color_array_cursor db 0
+queue_front times 50 db 0
+queue_rear db 0
+queue_cursor db 0
 
 _start:
 	xor ax, ax		;ax to 0
 	mov ds, ax		;ds to 0
 
-	mov al, 'b'
-	mov ah,0xe		;print char in al
-	mov bl,0xf		;char color (white)
-	int 10h
-	
-	call delay
-
-	mov al, 0xa
-	mov ah,0xe		;print char in al
-	int 10h
-
-	;print int
-	mov ax, word[rand]
-	call print_int
-	
-	call delay
-
-	
+	mov bx, [queue_front] 	;saves the memory adress of queue_front in bx
+	mov [queue_cursor], bx	;saves the memory adress of bx in queue_cursor 
+	mov [queue_rear], bx		;saves the memory adress of bx in queue_rear
 
 	.video_mode:
 		mov ah, 0 ;numero da chamada
 		mov al, 12h ;modo de video
 		int 10h
-	
+
 	call delay
 ;--------------------------------------------------------------------------------------------------;
 ;---------------------------------------------Working Area-----------------------------------------;
 ;--------------------------------------------------------------------------------------------------;
 	game:
-		call random 		;makes bl a random number between 1 and 4 and bh == 0
+		call random 				;makes bl a random number between 1 and 4 and bh == 0
+		mov byte[queue_rear], bl	;saves the randomly-generated value in the end of the queue
+
+		mov bl, byte[queue_rear]
+		call show_color		;muda background pra cor q está em bl
+		call delay
+
+		mov cl, queue_rear  
+		inc cl 				;increments the queue_rear, points to the next memory address
+		mov [queue_cursor], cl
+
+		mov bl, byte[queue_rear]
+		xor bh, bh
+		mov ax, bx
+		call print_int
+		call delay 
+
 
 		mov al, 0xa
 		mov ah,0xe		;print char in al
 		int 10h
 
-		mov ax, bx
-		call print_int
-
-		call delay
-	jmp game 
 
 		; .show_sequence:
-		; 	pop bx 				
-		; 	cmp bx, 0			;compara bx com 0
-		; 	je get_answer		;se for igual vá para get answer
-		; 	call show_color		;muda background pra cor q está em bl
-		; 	call delay			;delay
-		; 	jmp .show_sequence	;recomeça
+		; 	mov bh, byte[queue_cursor] 
+		; 	mov byte[queue_front], bh
+		; 	.loop:
+		; 		mov bl, byte[queue_cursor] 
+		; 		cmp bl, 0			;compara bx com 0
+		; 		je get_answer		;se for igual vá para get answer
+		; 		add byte[queue_cursor], 1  				
+		; 		call show_color		;muda background pra cor q está em bl
+		; 		call delay			;delay
+		; 	jmp .loop				;recomeça
 
 		; ;GERSON
 		; ;mostra mensagem pra pedir sequencia invertida
 		; get_answer:
-		; 	mov sp, word[stack]
-		; 	times 4 call delay			;delay
+		; 	mov al, 'b'
+		; 	mov ah,0xe		;print char in al
+		; 	mov bl,0xf		;char color (white)
+		; 	int 10h
+
+		; 	times 2 call delay			;delay
 		; 	jmp game
 
 		; .next_level:
@@ -82,9 +87,9 @@ _start:
 		; 	call inc_score	;incrementa score
 		; 	mov ax, word[score]
 		; 	cmp ax, word[highscore]
-		; 	jg game
+		; 	ja game
 		; 	inc word[highscore]
-		; 	jmp game
+			jmp game
 ;--------------------------------------------------------------------------------------------------;
 jmp end
 
@@ -116,6 +121,14 @@ print_int:			;show the integer in al as a string in the screen
 			jne .print		;if counter != 0, prints the next char
 
 ret	;else, return
+
+inc_score:	;incrementa score
+	mov si, score 	;coloca endereço de score em ds
+	lodsw 			;ax = [score]
+	inc ax			;ax++
+	mov di, score 	;coloca endereço de score em es
+	stosw 			;[score] = ax
+ret
 
 ;-------------------------------------------------;
 ;--------------Auxiliary functions----------------;
@@ -159,8 +172,14 @@ ret
 ;Save the char in the reg al before using this function.
 print_char:				;Função de printar caractere na tela
 	mov ah,0xe			;Codigo da instrucao de imprimir um caractere que esta em al
-	mov bl,2			;Cor do caractere em modos de video graficos (verde)
+	mov bl,0xf			;Cor do caractere em modos de video graficos (branco)
 	int 10h				;Interrupcao de video.
+ret
+
+show_color: 			;mostra cor em bl
+	mov ah, 0xb 		;numero da chamada
+	mov bh, 0  			;id da paleta de cores
+	int 10h				;video interrupt		
 ret
 
 end:
