@@ -7,9 +7,9 @@ game_over_msg db "                G   A   M   E       O   V   E   R   ! ! !", 0
 score_msg db "Your score is: ", 0
 highscore_msg db "The High Score is: ", 0
 answer_message db " Enter the sequence, then press Enter.", 13, 10, 13, 10, " ", 0
-next_level_message db " C", 10, 10," O", 10, 10," N", 10, 10, " G", 10, 10, " R", 10, 10, " A", 10, 10, " T", 10, 10, " U", 10, 10, " L            YOU ARE IN THE NEXT LEVEL!!!",8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8, 10, 10, " A", 10,  10," T", 10,  10," I", 10, 10, " O", 10, 10, " N", 10, 10, " S",0 
+next_level_message db " C", 10, 10," O", 10, 10," N", 10, 10, " G", 10, 10, " R", 10, 10, " A", 10, 10, " T", 10, 10, " U", 10, 10, " L            GET READY TO THE NEXT LEVEL!!!",8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8, 10, 10, " A", 10,  10," T", 10,  10," I", 10, 10, " O", 10, 10, " N", 10, 10, " S",0 
 menu_message db "             Welcome to the Lenux-based Color Sequence Game!", 13, 10, 13, 10, 0
-game_instructions db " Instructions:", 13, 10,"  Look carefully to the screen and memorize the color order.", 13, 10,"  Insert the order according to:", 13, 10, "     1 - Blue", 13, 10, "     2 - Green", 13, 10, "     3 - Cyan", 13, 10, "     4 - Red",13, 10, "     Ignore - Black",0
+game_instructions db " Instructions:", 13, 10," - Look carefully to the screen and memorize the color order.", 13, 10, " - Do not press any key unless the game instructs you to do so, pressing the", 13, 10, "   wrong key or any key in some inappropriate moment will result in GAME OVER.", 13, 10," - Insert the order according to:", 13, 10, "     1 - Blue", 13, 10, "     2 - Green", 13, 10, "     3 - Cyan", 13, 10, "     4 - Red",13, 10, "     Ignore - Black",0
 control_instructions db 13, 10, 13, 10, 13, 10, 13, 10, 13, 10, 13, 10, 13, 10, 13, 10, 13, 10, 13, 10, 13, 10, 13, 10, 13, 10, 13, 10, 13, 10, 13, 10, 13, 10, "                 Press Enter to start or ESC to leave", 0
 number times 2 db 0
 answer db 0
@@ -155,7 +155,9 @@ _start:
 				call print_string
 
 				mov si, queue_front
+
 				.answer:
+
 					mov al, ' ' 		;prints a space between each number
 					call print_char
 					
