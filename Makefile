@@ -59,9 +59,9 @@ compiles:
 
 writing_on_disk:
 		dd if=$(stage1).bin of=$(disk) bs=$(blockSize) count=1 conv=notrunc status=noxfer
-		dd if=$(stage2).bin of=$(disk) bs=$(blockSize) seek=1 count=2 conv=notrunc status=noxfer
-		dd if=$(kernel1).bin of=$(disk) bs=$(blockSize) seek=4 count=5 conv=notrunc
-		dd if=$(kernel2).bin of=$(disk) bs=$(blockSize) seek=9 count=3 conv=notrunc
+		dd if=$(stage2).bin of=$(disk) bs=$(blockSize) seek=1 count=3 conv=notrunc status=noxfer
+		dd if=$(kernel1).bin of=$(disk) bs=$(blockSize) seek=5 count=5 conv=notrunc
+		dd if=$(kernel2).bin of=$(disk) bs=$(blockSize) seek=10 count=3 conv=notrunc
 
 hexdump:
 		hexdump $(file)

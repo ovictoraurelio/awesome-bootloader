@@ -245,7 +245,7 @@ start:
 														; this interrupt use all of registers below
 				mov	al, 0x5				; Number of sectors to read
 				mov	ch, 0x00			  ; Cylinder number
-				mov	cl, 0x5				; Sector to read.
+				mov	cl, 0x6				; Sector to read.
 				mov	dh, 0x0				  ; Head number
 				mov dl, 0x0		      ; Drive number
 				int	0x13					  ; DISK interrupt
@@ -270,7 +270,7 @@ start:
 														; this interrupt use all of registers below
 				mov	al, 0x3					; Number of sectors to read
 				mov	ch, 0x0				  ; Cylinder number
-				mov	cl, 0xa				; Sector to read.
+				mov	cl, 0xb				; Sector to read.
 				mov	dh, 0x0				  ; Head number
 				mov dl, 0x0		      ; Drive number
 				int	0x13					  ; DISK interrupt

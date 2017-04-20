@@ -38,7 +38,7 @@ start:
           	mov	ah, 0x02				; Interrupt that read sectors into Memory
                                 ; this interrupt use all of registers below
             mov	ch, 0x0				  ; Cylinder number
-          	mov	al, 0x02				; Number of sectors to read
+          	mov	al, 0x03				; Number of sectors to read
           	mov	cl, 0x02				; Sector to read.
           	mov	dh, 0x0				  ; Head number
           	mov dl, 0x0		      ; Drive number
