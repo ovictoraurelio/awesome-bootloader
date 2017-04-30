@@ -19,6 +19,13 @@ Awesome bootloader is a bootloader built in Assembly x86 for PC
 ```
 
 
+## A example of Awesome-Bootloader (windows selected)
+![alt text](http://victoraurelio.com/images/windows.gif)
+
+## A example of Awesome-Bootloader (leenux selected)
+![alt text](http://victoraurelio.com/images/leenux.gif)
+
+
 [Gerson Fialho]: <http://cin.ufpe.br/~jgfn>
 [Nathan Prestwood]: <http://cin.ufpe.br/~nmf2>
 [Victor Aurélio]: <http://cin.ufpe.br/~vags>
